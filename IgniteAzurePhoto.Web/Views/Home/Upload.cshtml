@@ -1,0 +1,94 @@
+﻿
+@{
+    ViewBag.Title = "Upload";
+}
+
+<h2>Upload</h2>
+
+<form enctype="multipart/form-data" method="post" action='@Url.Action("Upload")'>
+
+  <p>
+    Take a picture and upload it to the photo album
+  </p>
+
+  <input type="file" name="photoToUpload" id="photoToUpload" accept="image/*" capture="camera" class="btn" />
+
+  <div class="button-group">
+    <a href="#" id="browse" class="btn btn-default">Take a Pic!</a>
+    <a href="#" id="save" class="btn btn-default">Upload</a>
+    <a href="#" id="clear" class="btn btn-danger">Clear</a>
+  </div>
+
+
+  <div class="progress" style="margin-top: 20px;">
+    <div id="progress" class="progress-bar" role="progressbar" 
+         aria-valuenow="0" aria-valuemin="0" aria-valuemax="100" 
+         style="width: 0%;">
+      0%
+    </div>
+  </div>
+
+</form> 
+
+@section scripts {
+<script type="text/javascript">
+
+  (function (){
+
+    $("#browse").click(function () {
+      $("#photoToUpload").click();
+    });
+
+    $("#save").click(function () {
+      uploadFile();
+    });
+
+    $("#clear").click(function () {
+      $("#photoToUpload").value("");
+    });
+
+  })();
+
+  function uploadFile() {
+
+    var data = new FormData();
+    var count = document.getElementById('photoToUpload').files.length;
+
+    for (var index = 0; index < count; index++) {
+
+      var file = document.getElementById('photoToUpload').files[index];
+      data.append("photoToUpload", file);
+
+    }
+
+    var xhr = new XMLHttpRequest();
+    xhr.upload.addEventListener("progress", uploadProgress, false);
+
+    xhr.open("POST", "@Url.Action("Upload")");
+    xhr.send(data);
+
+  }
+
+  function uploadProgress(evt) {
+
+    if (evt.lengthComputable) {
+
+      var percentComplete = Math.round(evt.loaded * 100 / evt.total);
+
+      var progressBar = document.getElementById('progress');
+      progressBar.setAttribute("aria-valuenow", percentComplete);
+      progressBar.style.width = percentComplete.toString() + "%";
+      progressBar.innerHTML = percentComplete.toString() + "%";
+
+    }
+
+    else {
+
+      document.getElementById('progress').innerHTML = 'unable to compute';
+
+    }
+
+  }
+
+</script>
+}
